@@ -2,7 +2,7 @@
 
 Разбор всех публичных репозиториев организации [BAITC-Hacks](https://github.com/orgs/BAITC-Hacks) после финала **HackAlem.ai** (23 сентября 2026, пятичасовой спринт, 12 кейсов от партнёров). Сайт показывает, как команды решали каждый кейс: основные подходы, решения, у которых стоит поучиться, типичные пробелы, стек и модели. По каждому проекту доступны README, дерево файлов и история коммитов.
 
-Сайт статический, сервер не нужен. Лежит в [`site/`](site/).
+**Сайт: https://govnejri.github.io/hackalem-atlas/**
 
 | | |
 |---|---|
@@ -17,73 +17,9 @@
 
 - **Обзор**: выводы для участников и организаторов, число команд по кейсам, коммиты по времени, готовность решений, модели и провайдеры, как работали команды, рекорды.
 - **Страница каждого из 12 треков**: как решали (группы подходов с примерами), на что посмотреть, что работало, типичные пробелы, заметки для организаторов, таблица всех решений с поиском и фильтром.
-- **Карточка проекта**: анализ, README, структура, коммиты. На карточку можно дать прямую ссылку `#p-<id>`, кнопка ⧉ копирует её.
+- **Карточка проекта**: анализ, README, структура, коммиты. Кнопка ⧉ копирует прямую ссылку на проект.
 - **Поиск команды или проекта** по всем 1 267 репозиториям. Открывается клавишей `/`.
 - Светлая и тёмная темы, работает и на телефоне.
-
-Прямые ссылки: `#overview`, `#t1` … `#t12`, `#other`, `#about`, `#p-00030236`.
-
-## Посмотреть локально
-
-Данные треков подгружаются через `fetch`, поэтому нужен любой локальный HTTP-сервер (при открытии через `file://` не загрузятся README и коммиты):
-
-```bash
-cd site
-python3 -m http.server 8000
-# открыть http://localhost:8000
-```
-
-
-
-## Структура
-
-```
-site/                   готовый сайт, только эта папка публикуется
-  index.html            страница со встроенной сводкой
-  data/t{0..12}.json    README, деревья файлов и коммиты по трекам (t0 — вне кейсов)
-  og.png, favicon.svg
-pipeline/               как собран разбор
-  clone_one.sh          blobless-клон репозитория: история и деревья без содержимого файлов
-  extract.py            коммиты, авторы, дерево, флаги, README → work/extracted.jsonl
-  prep.py               эвристика по ключевым словам + карточки репозиториев для агентов
-  prep_adj.py           выбор спорных классификаций для перепроверки
-  prep_syn.py           досье по трекам для синтеза
-  save_results.py       ответы workflow → work/analysis.json, adjudication.json, synthesis.json
-  workflows/            скрипты Claude Code Workflow: 01 анализ, 02 перепроверка, 03 синтез
-  build_site.py         сборка site/ (маскировка секретов и ПДн)
-  make_og.py            картинка-превью site/og.png
-  template.html         шаблон страницы
-work/                   промежуточные данные, НЕ коммитятся (см. .gitignore)
-```
-
-## Как пересобрать
-
-Нужны `gh` (с авторизацией), `git`, `jq`, Python 3.10+, Chromium для превью и Claude Code для шагов с агентами. Шаги с агентами — это скрипты Claude Code Workflow: запускайте их из Claude Code, передавая в `args` содержимое указанного JSON-файла.
-
-```bash
-export WORK=$PWD/work && mkdir -p work
-# 1. список публичных репозиториев
-gh api --paginate "orgs/BAITC-Hacks/repos?per_page=100&type=public" \
-  --jq '.[] | {name, description, created_at, pushed_at, updated_at, size, language, default_branch, html_url}' > work/all_repos.jsonl
-# 2. клоны без содержимого файлов (~1 ч для 3 653 репозиториев)
-jq -r .name work/all_repos.jsonl | xargs -P 24 -n 1 pipeline/clone_one.sh
-# 3. коммиты, деревья, README → work/extracted.jsonl
-python3 pipeline/extract.py
-# 4. анализ: карточки → work/batches/, аргументы → work/analyze_args.json
-python3 pipeline/prep.py 20
-#    Workflow pipeline/workflows/01_analyze.js, args = work/analyze_args.json, затем
-python3 pipeline/save_results.py analyze <папка-запуска>/journal.jsonl
-# 5. перепроверка спорных: → work/adj/ и work/adjudicate_args.json
-python3 pipeline/prep_adj.py
-#    Workflow 02_adjudicate.js, args = work/adjudicate_args.json; сохраните его результат в файл и
-python3 pipeline/save_results.py adjudicate result.json
-# 6. синтез: сводка + досье → work/syn/ и work/synthesize_args.json
-python3 pipeline/build_site.py && python3 pipeline/prep_syn.py
-#    Workflow 03_synthesize.js, args = work/synthesize_args.json, затем
-python3 pipeline/save_results.py synthesize result.json
-# 7. финальная сборка (падает, если в публикуемых данных остались ключи, email или названия репо с секретами)
-python3 pipeline/build_site.py && python3 pipeline/make_og.py
-```
 
 ## Методика
 
@@ -96,9 +32,10 @@ python3 pipeline/build_site.py && python3 pipeline/make_og.py
 
 ## Приватность
 
-- В README на сайте замаскированы API-ключи, токены и пароли (`sk-…`, `AIza…`, `nvapi-…`, `hf_…`, значения `API_KEY=…`, `пароль \`…\``, пароли в URL и т.п.), личные email, ИИН и настоящие на вид телефоны.
+- В README на сайте замаскированы API-ключи, токены и пароли, личные email, ИИН и настоящие на вид телефоны.
 - Репозитории с закоммиченными секретами и команды в пунктах о времени коммитов в выводах не названы.
 - Email авторов коммитов не публикуются.
-- `work/` содержит сырые данные без маскировки и в git не попадает.
 
 Тексты README принадлежат командам-авторам и взяты из их публичных репозиториев.
+
+Скрипты сбора и анализа лежат в [`pipeline/`](pipeline/), готовый сайт в [`site/`](site/).
