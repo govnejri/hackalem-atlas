@@ -33,27 +33,7 @@ python3 -m http.server 8000
 # открыть http://localhost:8000
 ```
 
-## Деплой
 
-В `site/` уже лежит готовый сайт: `index.html` (~4 МБ, сводные данные встроены), `data/t0.json` … `data/t12.json` (~35 МБ, README, деревья и коммиты по трекам), `favicon.svg`, `og.png`, `.nojekyll`.
-
-### GitHub Pages (основной вариант)
-
-1. Создайте публичный репозиторий. Для приватных репозиториев Pages есть только на платных планах.
-2. Сразу включите Pages: **Settings → Pages → Build and deployment → Source: GitHub Actions**. Если сначала запушить, первый запуск workflow упадёт, потому что Pages ещё выключены.
-3. Запушьте эту папку в ветку `main`. Workflow [`.github/workflows/pages.yml`](.github/workflows/pages.yml) выкладывает `site/` при каждом пуше, который меняет `site/`. Если первый запуск всё-таки упал, откройте **Actions → Deploy site to GitHub Pages → Run workflow** (или **Re-run all jobs**).
-4. Сайт будет по адресу `https://<user>.github.io/<repo>/`. Workflow сам подставит абсолютный адрес в `og:image`, чтобы превью ссылки работало в Telegram и соцсетях.
-
-Лимиты GitHub Pages: сайт до 1 ГБ, файл до 100 МБ. У нас всего ~38 МБ, самый крупный файл ~5 МБ.
-
-### Netlify, Vercel, Cloudflare Pages
-
-- **Netlify**: подключите репозиторий, настройки возьмутся из [`netlify.toml`](netlify.toml) (publish = `site`). Можно без репозитория: перетащите папку `site/` на app.netlify.com/drop.
-- **Vercel**: `vercel deploy` из корня. [`vercel.json`](vercel.json) указывает `outputDirectory: site`, а [`.vercelignore`](.vercelignore) пропускает в загрузку только `site/`, чтобы `work/` с сырыми данными не попал на сервер.
-- **Cloudflare Pages**: build command пустой, build output directory `site`.
-- Любой статический хостинг или S3: загрузите содержимое `site/` как есть.
-
-Для превью ссылок вне GitHub Pages замените в `site/index.html` значение `og:image` на абсолютный адрес `https://<ваш-домен>/og.png`.
 
 ## Структура
 
