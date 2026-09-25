@@ -1,0 +1,39 @@
+# Deploys the prebuilt static site in site/ to GitHub Pages.
+# One-time setup: repo Settings → Pages → Build and deployment → Source: "GitHub Actions".
+name: Deploy site to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths: ["site/**", ".github/workflows/pages.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: pages
+        uses: actions/configure-pages@v5
+      # Link previews (Telegram, Slack, X) need absolute URLs for og:image / og:url.
+      - name: Point link-preview tags at the Pages URL
+        run: |
+          base="${{ steps.pages.outputs.base_url }}"
+          sed -i "s#<meta property=\"og:image\" content=\"og.png\">#<meta property=\"og:image\" content=\"${base}/og.png\"><meta property=\"og:url\" content=\"${base}/\">#" site/index.html
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deployment
+        uses: actions/deploy-pages@v4

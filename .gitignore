@@ -1,0 +1,8 @@
+# Intermediate data: raw READMEs with unmasked secrets, commit author e-mails, per-repo notes
+# that name repos with leaked keys. Never publish it — only site/ is public.
+work/
+# claude.ai Artifact build of the same page
+artifact/
+__pycache__/
+*.pyc
+.DS_Store
