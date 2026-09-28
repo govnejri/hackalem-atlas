@@ -357,7 +357,13 @@ table.projects{width:100%;border-collapse:collapse;font-size:13.5px;min-width:86
 .mobile-sort select{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:7px 8px}
 .pulse{touch-action:pan-y}
 
-body:not([data-view="overview"]) #lede,body:not([data-view="overview"]) #kpis{display:none}
+body:not([data-view="overview"]) #lede,body:not([data-view="overview"]) #kpis,body:not([data-view="overview"]) #support{display:none}
+.support{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;justify-self:start;padding:10px 12px 10px 16px;background:var(--surface);border:1px solid var(--line);border-radius:12px;max-width:100%}
+.support p{font-size:14px;color:var(--ink-2)}
+.support-a{display:flex;flex-wrap:wrap;gap:8px}
+.btn.star{border-color:var(--gold-mark);font-weight:600}
+.btn.star:hover{background:var(--gold-soft);border-color:var(--gold-mark)}
+.btn .st{color:var(--gold-mark);font-size:15px;line-height:1}
 body:not([data-view="overview"]) .top h1{font-size:clamp(20px,2.4vw,26px)}
 body:not([data-view="overview"]) .top{gap:10px;padding-block:16px 14px}
 
@@ -367,6 +373,8 @@ main:focus{outline:none}
 
 /* ---------- phones ---------- */
 @media (max-width:640px){
+  .support{padding:12px;gap:10px}
+  .support-a,.support-a .btn{flex:1 1 auto;justify-content:center}
   body{font-size:14.5px}
   .top{padding-block:16px 16px;gap:14px}
   .top h1{font-size:26px}
@@ -443,6 +451,13 @@ main:focus{outline:none}
   <h1>Атлас решений <em>HackAlem</em></h1>
   <p class="lede" id="lede"></p>
   <div class="kpis" id="kpis"></div>
+  <div class="support" id="support">
+    <p>Если разбор пригодился, поставьте звезду репозиторию — так вы поддержите автора.</p>
+    <div class="support-a">
+      <a class="btn star" href="https://github.com/govnejri/hackalem-atlas" target="_blank" rel="noopener"><span class="st" aria-hidden="true">★</span>Звезда на GitHub</a>
+      <a class="btn" href="https://t.me/govnejri" target="_blank" rel="noopener">Telegram: <b class="mono">@govnejri</b></a>
+    </div>
+  </div>
 </header>
 <div class="shell">
   <nav class="rail" id="rail" aria-label="Треки"></nav>
@@ -451,6 +466,7 @@ main:focus{outline:none}
 <footer class="foot">
   <div>Данные на 25 сентября 2026 · источник: публичные репозитории <a href="https://github.com/orgs/BAITC-Hacks" target="_blank" rel="noopener">github.com/orgs/BAITC-Hacks</a></div>
   <div>Это не оценка жюри: выводы сделаны по README, структуре файлов и истории git, код не запускался. <a href="#about">Как собран разбор</a></div>
+  <div>Автор — <a href="https://t.me/govnejri" target="_blank" rel="noopener">@govnejri</a> в Telegram · <a href="https://github.com/govnejri/hackalem-atlas" target="_blank" rel="noopener">исходники на GitHub</a> — звезда поддержит автора</div>
 </footer>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 <div class="scrim" id="scrim" hidden></div>
